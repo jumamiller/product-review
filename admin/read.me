@@ -1,3 +1,23 @@
+### Fake Product Review Monitoring and Product Evaluation using Opinion Mining
+Product reviews play an important role in deciding the sale of a particular product on the e-commerce websites or applications like Flipkart, Amazon, Snapdeal, etc. 
+
+The application framework works to detect fake product reviews or spam reviews by using Opinion Mining. 
+
+The Opinion mining is also known as Sentiment Analysis. In sentiment analysis, we try to figure out the opinion of a customer through a piece of text. 
+
+We first take the review and check if the review is related to the specific product with the help of Decision tree. 
+
+We use Spam dictionary to identify the spam words in the reviews. In Text Mining we apply several algorithms and on the basis of these algorithms we get the specific results.
+
+Full source code can be found [here](https://github.com/jumamiller/product-review).
+
+### Project Structure
+The project is divided into following modules:
+- Admin Module - This module is used to manage the application.
+- User Module - This module is used to manage the user.
+- Data processing Module - This module is used to process the data.
+
+```
 product-monitoring  # Product Monitoring
 │   README.md
 │   .env
@@ -75,3 +95,496 @@ product-monitoring  # Product Monitoring
 |   |   | wear.jpg
 |   └───Sports
 |   |   | ball.png
+
+```
+
+### User authentication
+The application ensures that only authenticated users review the products.
+
+The auth module is divided into 2:
+- Admin Authentication - This module is used to authenticate the admin.
+- User authentication - This module is used to authenticate the user.
+
+#### Admin Authentication
+```html
+<body>
+	<!--header-->
+	<!--<div class="col-md-12 wel-grid"> -->
+		<div class="header">
+			<div class="container">
+				<nav class="navbar navbar-default">
+					<div class="container-fluid">
+				<!---Brand and toggle get grouped for better mobile display-->
+						<div class="navbar-header">
+							<div class="navbar-brand">
+								<h1><a href=""><center>Online Shopping Admin Login Page</center></a></h1>
+							</div>
+						</div>
+					</div>
+				</nav>
+		    </div>
+		</div>
+	
+		<div class="login-page">
+  			<div class="form">
+    			<img class="imag" src = "../images/admin_login.png">
+    			<br>
+    			<form class="login-form" action="admin-login-check.php" method="post">
+      				<input type="text" placeholder="username" name="username" required/>
+      				<input type="password" placeholder="password" name="password" required />
+      				<button type="submit" name="submit">login</button>
+      				<!--<p class="message">Not registered? <a href="#"><font color='blue'>Create an account</font></a></p>-->
+    			</form>
+  			</div>
+		</div>
+	</div>
+</body>
+```
+
+The above template provides form for loggin in the admin.
+
+The form is then submitted to the `admin-login-check.php` file.
+```php
+<?php   
+    session_start();
+    $conn = mysqli_connect("localhost","root","");
+    if (mysqli_connect_errno())
+    {
+        echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    }
+    mysqli_select_db($conn,"ita");
+    if(isset($_POST['submit'])){
+        $username=$_POST["username"];
+        $password=$_POST["password"];
+        $sql="select username from admin where username='$username' and password='$password'";
+        
+        
+        $result = $conn->query($sql);
+        
+        $row2=mysqli_fetch_row($result);
+        if (mysqli_num_rows($result) > 0) {
+            
+            $_SESSION['user'] = $username;
+            
+                echo ("<SCRIPT LANGUAGE='JavaScript'>
+                window.alert('Welcome Admin')
+                window.location.href='ita-admin.php'
+                </SCRIPT>");
+        }
+        else {
+                echo ("<SCRIPT LANGUAGE='JavaScript'>
+                window.alert('Invalid Credentials')
+                window.location.href='admin-login.php'
+                </SCRIPT>");
+        }
+    }
+?>
+
+```
+The above code checks if the user has entered the correct username and password.
+Next, the user is redirected to the `admin.php` page. The same logic applies for user auth, but the user is redirected to the `dashboard.php` page.
+
+#### User Authentication
+Any user visiting out site should be registered as shown below:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Shopping</title>
+<!--css-->
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="stylesheet" href="css/ken-burns.css" type="text/css" media="all" />
+<link rel="stylesheet" href="css/animate.min.css" type="text/css" media="all" />
+<!--css-->
+<style>
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+
+.login-page {
+  width: 1000px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.form {
+  position: relative;
+  z-index: 1;
+  background: #bee5bd;
+  /*background-color: transparent;*/
+  max-width: 1160px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 25px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #50894f;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button:hover,.form button:active,.form button:focus {
+  background: #43A047;
+}
+.form .message {
+  margin: 15px 0 0;
+  color: #435142;
+  font-size: 12px;
+}
+.form .message a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+.form .register-form {
+  display: none;
+}
+.contain {
+  position: relative;
+  z-index: 1;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.contain:before, .contain:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.contain .info {
+  margin: 50px auto;
+  text-align: center;
+}
+.contain .info h1 {
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #1a1a1a;
+}
+.contain .info span {
+  color: #4d4d4d;
+  font-size: 12px;
+}
+.contain .info span a {
+  color: #000000;
+  text-decoration: none;
+}
+.contain .info span .fa {
+  color: #EF3B3A;
+}
+body {
+  background-image: url(images/login.jpg); /* fallback for old browsers */
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;      
+}
+</style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="ONLINE SHOPPING" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!--js-->
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<!--js-->
+<!--webfonts-->
+<link href='//fonts.googleapis.com/css?family=Cagliostro' rel='stylesheet' type='text/css'>
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
+<!--webfonts-->
+</head>
+<body>
+
+		<div class="header">
+			<div class="container">
+				<nav class="navbar navbar-default">
+					<div class="container-fluid">
+
+						<div class="navbar-header">
+							<div class="navbar-brand">
+								<h1><a href=""><center>Online Shopping SignUp Page</center></a></h1>
+							</div>
+						</div>
+					</div>
+				</nav>
+		    </div>
+		</div>
+	
+		<div class="login-page">
+  			<div class="form">
+  				
+    			<form class="login-form" action="user-sign-up.php" method="post">
+      			
+              <a href = "home.html"><h4> Return to Home Page </h4></a><br><br>
+              <input type="text" placeholder="Enter your full name ( first + middle + last)" name="uname"/>
+              <input type="text" placeholder="Enter your email id" name="email" />
+      				<input type="password" placeholder="Password (minimum 8 characters)" name="password" />
+              <input type="text" placeholder="Enter your contact number" name="phone" />
+              <input type="text" placeholder="Enter your Address ( Street + Area + City + Pincode)" name="address" />
+      				
+      				<button type="submit" name="submit">create</button>
+      				<p class="message">Already registered? <a href="sign-in.php"><font color='blue'>Sign In</font></a></p>
+    			</form>
+    			
+    			<br><br>
+  			</div>
+		</div>
+	</div>
+</body>
+</html>
+```
+
+The above code is the sign up page for the user. The user can enter his/her name, email id, password, contact number and address. These details are then submitted to `user-sign-up.php` for further processing as shown below:
+```php
+<?php   
+    session_start();
+    header("Cache-Control", "no-cache, no-store, must-revalidate");
+    $conn = mysqli_connect("localhost","root","");
+    if (mysqli_connect_errno())
+    {
+        echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    }
+    mysqli_select_db($conn,"ita");
+    $entry = 1;
+    if(isset($_POST['submit']))
+    {
+        $email=$_POST["email"];
+        $password=$_POST["password"];
+        $name=$_POST["uname"];
+        $phone=$_POST["phone"];
+        $address=$_POST["address"];
+
+        $check = "select * from users WHERE email='$email'";
+        $res = $conn->query($check);
+
+        $row = mysqli_fetch_row($res);
+        if (mysqli_num_rows($res) > 0)
+        {
+            $entry = 0;
+            echo ("<SCRIPT LANGUAGE='JavaScript'>
+                window.alert('User Already Exists!!Login to Shop')
+                window.location.href='sign-in.php'
+                </SCRIPT>");
+        }
+        
+        if(strlen($password)<8){
+            $entry = 0;
+            echo "<script>window.alert('Password - Atleast 8 characters!!')
+                    window.location.href='sign-up.php'</script>";
+        }
+
+        if($entry==1){
+    $sql="insert into users(name, email, password, phone, address) values ('$name','$email','$password','$phone','$address')";
+        if (mysqli_query($conn, $sql))
+        {
+            $_SESSION["user"] = $name;
+            echo "<script>window.alert('Record created successfully')
+                    window.location.href='men.php?login=1 & username=$name'</script>";
+        }	
+        else
+        {
+            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+        }
+    }
+    }
+?>
+
+```
+
+The above code receives user details from the sign up page and inserts them into the database. 
+
+The user is also given an option to logout using the `sign-out.php` page.
+```php
+<?php 
+	session_start();
+	unset($_SESSION["user"]);
+	session_destroy();
+	echo "<script>window.alert('See you again!!')
+							  window.location.href='home.html'</script>";
+?>
+```
+
+The above code has a  session variable which is unset and the session is destroyed. The user is then redirected to the home page.
+
+### Rating and Reviews
+The user can rate the products and give reviews. The rating and review is then submitted to the database.
+```php
+// review product
+<?php
+	session_start();
+	header("Cache-Control", "no-cache, no-store, must-revalidate");
+	$login = $_GET['login'];
+	$username = "Dummy";
+	if($login==0) 
+		include("header.php");
+	if($login==1 && isset($_SESSION["user"]))
+	{
+		$username = $_SESSION["user"];
+		include("login_header.php");
+	}
+	$conn = mysqli_connect("localhost","root","");
+	mysqli_select_db($conn,"ita");
+	$sql = "select * from orders where username like '$username' order by pid";
+	if ($result = $conn->query($sql))
+	{
+		
+	}
+	else
+	{
+		echo '<br><font face="verdana" color="blue" size="6"><b>You have not purchased any products to write a review!!<b></font>';
+		echo '<br><br><img src="images/sad.jpg" height="200px" width="200px" align="center"/><br><br>';
+		echo '<h2><a href="sign-out.php"><font face="helvetica" color="red">LOGOUT</font></a></h2>';
+	}
+
+?>
+<HTML>
+<HEAD>
+<TITLE>Review Product</TITLE>
+<!--<link href="imageStyles.css" rel="stylesheet" type="text/css" />-->
+<style>
+div.box  {
+	width: 500px;
+	height: auto;
+	border-style: solid;
+	border-radius: 15px;
+	border-color: grey;
+	padding: 20px;
+	margin: 5px;
+	
+	background-color: #d6ebd9;
+}
+
+div.box img {
+	width: 200px;
+	height: 200px;
+	margin-right: 10px;
+	-webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.5s;
+    text-align: right;
+    align-content: right;
+    align-items: right;
+}
+
+div.box img:hover {
+	transform: scale(1.2);
+}
+
+div.box h3 {
+	text-align: center;
+	font-family: arial;
+	padding-top: 20px; 
+}
+div.box h4 {
+	text-align: center;
+	font-family: arial;
+	padding-top: 20px; 
+}
+
+div.box input {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background-color: #4CAF50;
+	-webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+div.box input:hover {
+	background-color: #367477; 
+    color: white;	
+}
+
+div.box textarea {
+	width: 420px;
+}
+
+.gallery {
+	width: 200px;
+	height: 200px;
+	padding: 35px;
+}
+
+body {
+	background-image: url(images/background1.jpg) ;
+	text-align: center;
+}
+
+</style>
+
+</HEAD>
+<body>
+<br><br>
+
+<div class="main">
+<table align="center">
+<?php
+	$i=0;
+	if ($result = $conn->query($sql))
+	{
+		while($row = mysqli_fetch_assoc($result))
+		{
+			$pid = $row['pid'];
+			if($i%2==0){
+				echo"<tr>";
+			}
+
+			$prod = "select * from products where pid='$pid'";
+			$res = mysqli_query($conn, $prod);
+			$row1 = mysqli_fetch_array($res);
+
+			$category = "";
+			if($pid[0]==1)
+				$category = "men";
+			else if($pid[0]==2)
+				$category = "women";
+			else if($pid[0]==3)
+				$category = "books";
+			else if($pid[0]==4)
+				$category = "gadgets";
+			else if($pid[0]==5)
+				$category = "sports";
+
+			$pname = $row['pname'];
+			$email = $row['email'];
+
+			echo"<td><div class = 'box'><img src = 'images/Men/{$row1[4]}' alt = '{$row['pid']}'>
+			<h4><b>{$row['pname']}<b></h4>
+			<br>
+			<form action = 'review-submit.php?pid=$pid & pname = $pname & email=$email & username=$username' method = 'post'>
+			<textarea name='comment' rows='5' cols='40'></textarea><br>
+			<input type='submit' class='btn btn-primary' align='center' name='submit' value='Submit Review'></input></form></div></td>";
+			if($i%2==1){
+				echo"</tr>";
+			}
+			$i++;
+		}
+	}
+?>
+</table>
+</div>
+<br><br><br><br><br><br><br>
+</BODY>
+</HTML>
+<?php
+	echo "<br>"; 
+	include("footer.php");
+?>
+
+```
+The above script allows users to review an item which they had ordered.
